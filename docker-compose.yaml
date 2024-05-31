@@ -1,0 +1,9 @@
+services:
+   kafka:
+      env_file: kafka-env.env
+      image: ghcr.io/theg-r-itters/gitassistant/kafka:latest
+      ports:
+         - ${KAFKA_PORT}:${KAFKA_PORT}
+         - ${KAFKA_CONTROLLER_PORT}:${KAFKA_CONTROLLER_PORT}
+      volumes:
+         - ${KAFKA_DATA_PATH}:${KAFKA_CONTAINER_DATA_PATH}
