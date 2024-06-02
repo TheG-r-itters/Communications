@@ -1,7 +1,7 @@
 # Dockerfile-kafka
-LABEL org.opencontainers.image.source="https://github.com/theg-r-itters/docker-kafka"
-
 FROM confluentinc/cp-kafka
+
+LABEL org.opencontainers.image.source="https://github.com/theg-r-itters/docker-kafka"
 
 ENV KAFKA_BROKER_ID=1
 ENV KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
