@@ -1,0 +1,8 @@
+# Dockerfile-zookeeper
+FROM confluentinc/cp-zookeeper
+
+LABEL org.opencontainers.image.source="https://github.com/theg-r-itters/docker-zookeeper"
+
+ENV ZOOKEEPER_CLIENT_PORT=2181
+ENV ZOOKEEPER_TICK_TIME=2000
+EXPOSE 22181

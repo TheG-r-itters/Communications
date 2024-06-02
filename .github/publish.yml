@@ -3,14 +3,18 @@ name: publish
 on: [push]
 
 jobs:
-  publish-hello-world-image:
+  publish-kafka-images:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build the hello-world Docker image
+    - name: Build the kafka Docker image
       run: |
         echo $CR_PAT | docker login ghcr.io -u TheG-r-itters --password-stdin
+        docker build . -f dockerfile-zookeeper --tag ghcr.io/theg-r-itters/zookeeper:latest
+        docker build . -f dockerfile-kafka --tag ghcr.io/theg-r-itters/kafka:latest
+        docker push ghcr.io/theg-r-itters/zookeeper:latest
+        docker push ghcr.io/theg-r-itters/kafka:latest      
       env:
-        CR_PAT: ${{ secrets.CR_PAT }}
+        CR_PAT: ${{ secrets.CONTAINERREPOSITORY }}
