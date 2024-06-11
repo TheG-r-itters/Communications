@@ -3,6 +3,7 @@
 # set image and container names
 IMAGE_NAME="kafka-producer"
 CONTAINER_NAME="kafka-producer-container"
+
 FORCE_REBUILD=false
 FORCE_RESTART=false
 
@@ -23,21 +24,39 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ "$FORCE_REBUILD" = true ]]; then
+    echo "Force Rebuild option has been set"
+fi
+
+if [[ "$FORCE_RESTART" = true ]]; then
+    echo "Force Restart option has been set"
+fi
+
 # Check if the Docker image already exists
-if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" && "$FORCE_REBUILD" = true ]]; then
-    echo "Building the Docker image..."
+if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
+    echo "Docker image does not exist, building it..."
+    docker build -t $IMAGE_NAME .
+elif [[ "$FORCE_REBUILD" = true ]]; then
+    echo "Docker image already exists, but force rebuild is requested. Removing and building it again..."
+    # Stop the existing container, if any
+    if [[ "$(docker ps -q -f name=$CONTAINER_NAME 2> /dev/null)" != "" ]]; then
+        docker stop $CONTAINER_NAME
+        docker rm $CONTAINER_NAME
+    fi
+    # Remove the existing image
+    docker rmi $IMAGE_NAME
     docker build -t $IMAGE_NAME .
 else
     echo "Docker image already exists. Skipping build."
 fi
 
 # Check if the container is already running or force restart is requested
-if [[ "$(docker ps -q -f name=$CONTAINER_NAME)" ]] && [[ "$FORCE_RESTART" = true ]]; then
-      echo "Container is already running. Restarting it..."
-      docker restart $CONTAINER_NAME
-else if [[ "$(docker ps -q -f name=$CONTAINER_NAME)" ]]; then
-    echo "Container is already running. Skipping..."
+if [[ "$(docker ps -q -f name=$CONTAINER_NAME 2> /dev/null)" == "" ]]; then 
+    echo "Container is not running. Starting it..."
+    docker run -d --name $CONTAINER_NAME $IMAGE_NAME
+elif [[ "$FORCE_RESTART" = true ]]; then  
+    echo "Force restart is requested. Going to restart it..."
+    docker restart $CONTAINER_NAME
 else 
-    echo "Starting the container..."
-    docker run -d --name $CONTAINER_NAME -p 9092:9092 $IMAGE_NAME
+    echo "Container is already running..."
 fi
