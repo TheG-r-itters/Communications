@@ -1,7 +1,7 @@
 from confluent_kafka import Consumer, KafkaException
 
 c = Consumer({
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': 'localhost:9092',
     'group.id': 'mygroup',
     'auto.offset.reset': 'earliest'
 })
@@ -20,5 +20,6 @@ try:
             print(f'Received message: {msg.value().decode("utf-8")}')
 except KeyboardInterrupt:
     pass
+    print('Closing consumer...')
 finally:
     c.close()
