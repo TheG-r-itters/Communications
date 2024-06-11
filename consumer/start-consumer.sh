@@ -41,6 +41,9 @@ elif [[ "$FORCE_REBUILD" = true ]]; then
     # Stop the existing container, if any
     if [[ "$(docker ps -q -f name=$CONTAINER_NAME 2> /dev/null)" != "" ]]; then
         docker stop $CONTAINER_NAME
+    fi
+    # Remove the existing container, if any
+    if [[ "$(docker ps -qa -f name=$CONTAINER_NAME 2> /dev/null)" != "" ]]; then
         docker rm $CONTAINER_NAME
     fi
     # Remove the existing image
@@ -49,7 +52,11 @@ elif [[ "$FORCE_REBUILD" = true ]]; then
 else
     echo "Docker image already exists. Skipping build."
 fi
-
+# Check if there already is a container with the same name, and in case delete it
+if [[ "$(docker ps -qa -f name=$CONTAINER_NAME 2> /dev/null)" != "" ]]; then 
+    echo "A container is already present with the same name..deleting it"
+    docker rm $CONTAINER_NAME
+fi
 # Check if the container is already running or force restart is requested
 if [[ "$(docker ps -q -f name=$CONTAINER_NAME 2> /dev/null)" == "" ]]; then 
     echo "Container is not running. Starting it..."
